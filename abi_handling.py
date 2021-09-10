@@ -31,7 +31,7 @@ def gen_cut_fastas(in_file, path, filename, n=5):
     cut_data = in_data[start:stop]
     cut_data.id = filename
     SeqIO.write(cut_data, path + filename + '.fasta', 'fasta')
-def gen_cut_fastas_phred(in_file, path, filename, n=5):
+def gen_cut_fastas_phred(in_file, path, filename, n=5, min_length=10):
     '''
     Inputs name of .ab1 file as string and new file name to save .fasta file to.
     Saves a .fasta file with cut sequence and changed name.
@@ -59,7 +59,8 @@ def gen_cut_fastas_phred(in_file, path, filename, n=5):
     cut_data = in_data[start:stop]
     cut_data.id = filename
     print(stop-start, filename)
-    SeqIO.write(cut_data, path + filename + '.fasta', 'fasta')
+    if len(cut_data) >= min_length:
+        SeqIO.write(cut_data, path + filename + '.fasta', 'fasta')
 def rename_seqs(gen_path, data_file, path, ext):
     meta_data = pd.read_csv(gen_path + data_file)
     for j in ext:
