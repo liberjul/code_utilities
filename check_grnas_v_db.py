@@ -61,13 +61,13 @@ fwd_dict = {}
 with open(F"{args.output}_fwd_candidates.txt", "r") as ifile:
     line = ifile.readline()
     while line != "":
-        fwd_dict[line.strip()] = None
+        fwd_dict[line.strip().upper()] = None
         line = ifile.readline()
 rev_dict = {}
 with open(F"{args.output}_rev_candidates.txt", "r") as ifile:
     line = ifile.readline()
     while line != "":
-        rev_dict[line.strip()] = None
+        rev_dict[line.strip().upper()] = None
         line = ifile.readline()
 
 grna_hit_dict = {}
