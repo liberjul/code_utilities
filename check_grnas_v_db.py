@@ -29,6 +29,7 @@ parser.add_argument("-p", "--pam", default="NGG", type=str, help="PAM sequence, 
 parser.add_argument("-s", "--seed_len", default=10, type=int, help="Length of the seed sequence")
 parser.add_argument("--max_seed_mismatch", default=0, type=int, help="Number of allowed seed sequence mismatches")
 parser.add_argument("--max_distal_mismatch", default=0, type=int, help="Number of allowed distal sequence mismatches")
+parser.add_argument("-v", "--verbose", action="store_true", help="Print target sequences and running.")
 parser.add_argument("-o", "--output", type=str, help="Prefix of output files")
 args = parser.parse_args()
 
@@ -77,7 +78,7 @@ with open(F"{args.output}_rev_candidates.txt", "r") as ifile:
         rev_dict[line.strip().upper()] = None
         line = ifile.readline()
 
-print(F"{len(fwd_dict.keys())+len(rev_dict.keys())} candidates sites adjacent to PAM sequences found...")
+print(F"{len(fwd_dict.keys())+len(rev_dict.keys())} candidate sites adjacent to PAM sequences found...")
 
 below_threshold_hits = 0
 grna_hit_dict = {}
@@ -105,11 +106,13 @@ for grna_h in grna_dict.keys():
             grna_hit_dict[grna_h][target_r] = [seed_mm_score, distal_mm_score, "-"]
             below_threshold_hits += 1
 
-print(F"Found {below_threshold_hits} targets with {args.max_seed_mismatch} or fewer seed sequence mismatched bases and {args.max_distal_mismatch} or fewer distal seqeunce mismatched bases...")
+print(F"Found {below_threshold_hits} targets with {args.max_seed_mismatch} or fewer seed sequence mismatched bases and {args.max_distal_mismatch} or fewer distal sequence mismatched bases...")
 
 buffer ="gRNA_name,subject_name,target_sequence,seed_mismatch_score,distal_mismatch_score,strand,start,stop\n"
 for grna in grna_hit_dict.keys():
     for target in grna_hit_dict[grna].keys():
+        if args.verbose:
+            print(target)
         seed_mm_score, distal_mm_score, strand = grna_hit_dict[grna][target]
         subprocess.run(F"grep -B1 '{target}' {args.database} > temp_hits.out", shell=True)
         with open("temp_hits.out", "r") as ifile:
