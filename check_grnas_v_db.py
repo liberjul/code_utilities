@@ -26,11 +26,16 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--database", type=str, help="FASTA database to check for hits")
 parser.add_argument("-g", "--grnas", type=str, help="FASTA of gRNAs")
 parser.add_argument("-p", "--pam", default="NGG", type=str, help="PAM sequence, such as NGG")
-parser.add_argument("-s", "--seed_len", default=0, type=int, help="Length of the seed sequence")
+parser.add_argument("-s", "--seed_len", default=10, type=int, help="Length of the seed sequence")
 parser.add_argument("--max_seed_mismatch", default=0, type=int, help="Number of allowed seed sequence mismatches")
 parser.add_argument("--max_distal_mismatch", default=0, type=int, help="Number of allowed distal sequence mismatches")
 parser.add_argument("-o", "--output", type=str, help="Prefix of output files")
 args = parser.parse_args()
+
+print(F"PAM sequence 5'->3': {args.pam}")
+print(F"Seed sequence length: {args.seed_len}")
+print(F"Maximum mismatches in seed sequence: {args.max_seed_mismatch}")
+print(F"Maximum mismatches in distal sequence: {args.max_distal_mismatch}")
 
 grna_dict = {}
 max_grna_len = 0
@@ -46,6 +51,8 @@ with open(args.grnas, "r") as ifile:
         if len(seq) > max_grna_len:
             max_grna_len = len(seq)
         grna_dict[header] = seq
+
+print(F"Searching for matches to {len(grna_dict.keys())} gRNAs...")
 
 PAM_str_f = args.pam.replace("N", ".")
 PAM_str_r = reverse_complement(args.pam).replace("N", ".")
@@ -70,6 +77,9 @@ with open(F"{args.output}_rev_candidates.txt", "r") as ifile:
         rev_dict[line.strip().upper()] = None
         line = ifile.readline()
 
+print(F"{len(fwd_dict.keys())+len(rev_dict.keys())} candidates sites adjacent to PAM sequences found...")
+
+below_threshold_hits = 0
 grna_hit_dict = {}
 for grna_h in grna_dict.keys():
     seed_g = grna_dict[grna_h][-args.seed_len:]
@@ -83,6 +93,7 @@ for grna_h in grna_dict.keys():
         distal_mm_score = sum(c1!=c2 for c1,c2 in zip(distal_g,distal_t))
         if seed_mm_score <= args.max_seed_mismatch and distal_mm_score <= args.max_distal_mismatch:
             grna_hit_dict[grna_h][target] = [seed_mm_score, distal_mm_score, "+"]
+            below_threshold_hits += 1
 
     for target_r in rev_dict.keys():
         target = reverse_complement(target_r)
@@ -92,6 +103,9 @@ for grna_h in grna_dict.keys():
         distal_mm_score = sum(c1!=c2 for c1,c2 in zip(distal_g,distal_t))
         if seed_mm_score <= args.max_seed_mismatch and distal_mm_score <= args.max_distal_mismatch:
             grna_hit_dict[grna_h][target_r] = [seed_mm_score, distal_mm_score, "-"]
+            below_threshold_hits += 1
+
+print(F"Found {below_threshold_hits} targets with {args.max_seed_mismatch} or fewer seed sequence mismatched bases and {args.max_distal_mismatch} or fewer distal seqeunce mismatched bases...")
 
 buffer ="gRNA_name,subject_name,target_sequence,seed_mismatch_score,distal_mismatch_score,strand,start,stop\n"
 for grna in grna_hit_dict.keys():
