@@ -17,10 +17,11 @@
 # 2A. Of the possible target sites, check against provided sgRNAs
 #
 
-import glob, sys, os, argparse, subprocess
+import glob, sys, os, argparse, subprocess, time
 from auto_sanger_seq_assem import reverse_complement
 
 # Provide path to files and path to new, modified files
+start = time.time()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--database", type=str, help="FASTA database to check for hits")
@@ -133,3 +134,5 @@ for grna in grna_hit_dict.keys():
                     loc = seq.find(target, loc+1)
 with open(F"{args.output}_hits_above_threshold.csv", "w") as ofile:
     ofile.write(buffer)
+
+print(F"Finished in {time.time()-start} seconds.")
