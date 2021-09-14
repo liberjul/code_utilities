@@ -160,6 +160,8 @@ for grna_h in grna_dict:
 buffer ="gRNA_name,subject_name,target_sequence,seed_mismatch_score,distal_mismatch_score,strand,start,stop\n"
 
 buffer_list = [pool.apply(find_and_report_hit_loc, args=(grna, grna_hit_dict, args.verbose, args.database)) for grna in grna_hit_dict]
+
+pool.close()
 buffer += "".join(buffer_list)
 hit_count = buffer.count('\n')-1
 

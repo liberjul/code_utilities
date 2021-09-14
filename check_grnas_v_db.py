@@ -105,9 +105,9 @@ for grna_h in grna_dict.keys():
             grna_hit_dict[grna_h][target_r] = [seed_mm_score, distal_mm_score, "-"]
 
 buffer ="gRNA_name,subject_name,target_sequence,seed_mismatch_score,distal_mismatch_score,strand,start,stop\n"
-line_set = set()
+oline_dict = {}
 for grna in grna_hit_dict.keys():
-    for target in grna_hit_dict[grna].keys():
+    for target in grna_hit_dict[grna]:
         if args.verbose:
             print(target)
         seed_mm_score, distal_mm_score, strand = grna_hit_dict[grna][target]
@@ -124,15 +124,15 @@ for grna in grna_hit_dict.keys():
                 loc = seq.find(target, 0)
                 while loc != -1:
                     if loc != -1 and strand == "+":
-                        line = F"{grna},{header},{target},{seed_mm_score},{distal_mm_score},{strand},{loc+1},{loc+1+len(target)}\n"
-                        if line not in line_set:
-                            line_set.add(line)
-                            buffer = F"{buffer}{line}"
+                        oline = F"{grna},{header},{target},{seed_mm_score},{distal_mm_score},{strand},{loc+1},{loc+1+len(target)}\n"
+                        if oline not in oline_dict:
+                            oline_dict[oline] = None
+                            buffer = F"{buffer}{oline}"
                     elif loc != -1 and strand == "-":
-                        line = F"{grna},{header},{target},{seed_mm_score},{distal_mm_score},{strand},{loc+1+len(target)},{loc+1}\n"
-                        if line not in line_set:
-                            line_set.add(line)
-                            buffer = F"{buffer}{line}"
+                        oline = F"{grna},{header},{target},{seed_mm_score},{distal_mm_score},{strand},{loc+1+len(target)},{loc+1}\n"
+                        if oline not in oline_dict:
+                            oline_dict[oline] = None
+                            buffer = F"{buffer}{oline}"
                     loc = seq.find(target, loc+1)
 
 hit_count = buffer.count('\n')-1
