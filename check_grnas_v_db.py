@@ -63,8 +63,8 @@ rev_grep_str = PAM_str_r + "."*max_grna_len
 sed_str = "."*len(args.pam)
 
 # Make forward and reverse potential gRNA cut sites
-subprocess.run(F"grep -o '{fwd_grep_str}' {args.database} | sed 's/{sed_str}$//' > {args.output}_fwd_candidates.txt", shell=True)
-subprocess.run(F"grep -o '{rev_grep_str}' {args.database} | sed 's/^{sed_str}//' > {args.output}_rev_candidates.txt", shell=True)
+subprocess.run(F"grep -o '{fwd_grep_str}' {args.database} | sed 's/{sed_str}$//' | sed 's/U/T/' > {args.output}_fwd_candidates.txt", shell=True)
+subprocess.run(F"grep -o '{rev_grep_str}' {args.database} | sed 's/^{sed_str}//' | sed 's/U/T/' > {args.output}_rev_candidates.txt", shell=True)
 
 fwd_dict = {}
 with open(F"{args.output}_fwd_candidates.txt", "r") as ifile:

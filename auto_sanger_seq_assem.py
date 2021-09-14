@@ -1,4 +1,9 @@
-def reverse_complement(seq):
+def reverse_complement(seq, rna=False):
+    if rna:
+        comp_dict = {"A" : "U", "U" : "A", "C" : "G", "G" : "C",
+                    "N" : "N", "R" : "Y", "Y" : "R", "S" : "W",
+                    "W" : "S", "K" : "M", "M" : "K", "B" : "V",
+                    "V" : "B", "D" : "H", "H" : "D"}
     comp_dict = {"A" : "T", "T" : "A", "C" : "G", "G" : "C",
                 "N" : "N", "R" : "Y", "Y" : "R", "S" : "W",
                 "W" : "S", "K" : "M", "M" : "K", "B" : "V",
