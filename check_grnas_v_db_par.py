@@ -54,9 +54,17 @@ def find_and_report_hit_loc(grna, grna_hit_dict, verbose, database):
         # subprocess.run(F"grep -B1 '{target}' {args.database} > temp_hits.out", shell=True)
         grep_hits = subprocess.run(F"grep -B1 '{target}' {args.database}", shell=True, stdout=subprocess.PIPE).stdout.decode("utf-8").split("\n")
         # print(grep_hits)
-        for i in range(0, len(grep_hits)-1, 2):
-            header = grep_hits[i].strip()[1:]
-            seq = grep_hits[i+1].upper()
+        i = 0
+        line = grep_hits[0]
+        while line != "":
+            header = line.strip()[1:]
+            i += 1
+            line = grep_hits[i]
+            seq = ""
+            while line != "" and line[0] != ">":
+                seq = F"{seq}{line.strip().upper()}"
+                i += 1
+                line = grep_hits[i]
             loc = seq.find(target, 0)
             while loc != -1:
                 if loc != -1 and strand == "+":
@@ -127,22 +135,22 @@ with open(F"{args.output}_rev_candidates.txt", "r") as ifile:
 
 print(F"{len(fwd_dict.keys())+len(rev_dict.keys())} candidate sites adjacent to PAM sequences found...")
 
-pool = mp.Pool(mp.cpu_count())
+if mp.cpu_count() > len(grna_dict.keys()):
+    pool = mp.Pool(len(grna_dict.keys()))
+else:
+    pool = mp.Pool(mp.cpu_count())
 
 fwd_res = [pool.apply(look_for_hits, args=(grna_h, grna_dict, fwd_dict, "+", max_grna_len, args.seed_len, args.max_seed_mismatch, args.max_distal_mismatch)) for grna_h in grna_dict]
 rev_res = [pool.apply(look_for_hits, args=(grna_h, grna_dict, rev_dict, "-", max_grna_len, args.seed_len, args.max_seed_mismatch, args.max_distal_mismatch)) for grna_h in grna_dict]
 
-below_threshold_hits = fwd_res[0][0]
 grna_hit_dict = fwd_res[0][1]
 for grna_h in grna_dict:
     for i in fwd_res[1:]:
-        below_threshold_hits += i[0]
         if grna_h in grna_hit_dict and grna_h in i[1]:
             grna_hit_dict[grna_h].update(i[1][grna_h])
         elif grna_h in i[1]:
             grna_hit_dict[grna_h] = i[1][grna_h]
     for i in rev_res:
-        below_threshold_hits += i[0]
         if grna_h in grna_hit_dict and grna_h in i[1]:
             grna_hit_dict[grna_h].update(i[1][grna_h])
         elif grna_h in i[1]:

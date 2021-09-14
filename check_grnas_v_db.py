@@ -81,7 +81,6 @@ with open(F"{args.output}_rev_candidates.txt", "r") as ifile:
 
 print(F"{len(fwd_dict.keys())+len(rev_dict.keys())} candidate sites adjacent to PAM sequences found...")
 
-below_threshold_hits = 0
 grna_hit_dict = {}
 for grna_h in grna_dict.keys():
     seed_g = grna_dict[grna_h][-args.seed_len:]
@@ -95,7 +94,6 @@ for grna_h in grna_dict.keys():
         distal_mm_score = sum(c1!=c2 for c1,c2 in zip(distal_g,distal_t))
         if seed_mm_score <= args.max_seed_mismatch and distal_mm_score <= args.max_distal_mismatch:
             grna_hit_dict[grna_h][target] = [seed_mm_score, distal_mm_score, "+"]
-            below_threshold_hits += 1
 
     for target_r in rev_dict.keys():
         target = reverse_complement(target_r)
@@ -105,11 +103,9 @@ for grna_h in grna_dict.keys():
         distal_mm_score = sum(c1!=c2 for c1,c2 in zip(distal_g,distal_t))
         if seed_mm_score <= args.max_seed_mismatch and distal_mm_score <= args.max_distal_mismatch:
             grna_hit_dict[grna_h][target_r] = [seed_mm_score, distal_mm_score, "-"]
-            below_threshold_hits += 1
-
-print(F"Found {below_threshold_hits} targets with {args.max_seed_mismatch} or fewer seed sequence mismatched bases and {args.max_distal_mismatch} or fewer distal sequence mismatched bases...")
 
 buffer ="gRNA_name,subject_name,target_sequence,seed_mismatch_score,distal_mismatch_score,strand,start,stop\n"
+line_set = set()
 for grna in grna_hit_dict.keys():
     for target in grna_hit_dict[grna].keys():
         if args.verbose:
@@ -128,10 +124,19 @@ for grna in grna_hit_dict.keys():
                 loc = seq.find(target, 0)
                 while loc != -1:
                     if loc != -1 and strand == "+":
-                        buffer = F"{buffer}{grna},{header},{target},{seed_mm_score},{distal_mm_score},{strand},{loc+1},{loc+1+len(target)}\n"
+                        line = F"{grna},{header},{target},{seed_mm_score},{distal_mm_score},{strand},{loc+1},{loc+1+len(target)}\n"
+                        if line not in line_set:
+                            line_set.add(line)
+                            buffer = F"{buffer}{line}"
                     elif loc != -1 and strand == "-":
-                        buffer = F"{buffer}{grna},{header},{target},{seed_mm_score},{distal_mm_score},{strand},{loc+1+len(target)},{loc+1}\n"
+                        line = F"{grna},{header},{target},{seed_mm_score},{distal_mm_score},{strand},{loc+1+len(target)},{loc+1}\n"
+                        if line not in line_set:
+                            line_set.add(line)
+                            buffer = F"{buffer}{line}"
                     loc = seq.find(target, loc+1)
+
+hit_count = buffer.count('\n')-1
+print(F"Found {hit_count} targets with {args.max_seed_mismatch} or fewer seed sequence mismatched bases and {args.max_distal_mismatch} or fewer distal sequence mismatched bases...")
 with open(F"{args.output}_hits_above_threshold.csv", "w") as ofile:
     ofile.write(buffer)
 
