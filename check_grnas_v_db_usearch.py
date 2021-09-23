@@ -68,7 +68,7 @@ id_thresh = 1 - ((args.max_seed_mismatch + args.max_distal_mismatch)/max_grna_le
 
 print(F"Searching for matches to {len(grna_dict.keys())} gRNAs with identity >= {id_thresh}...")
 
-usearch_comd_list = [args.usearch_path, '-usearch_global', F"{args.grnas.split('.fasta')[0]}_with_PAM.fasta", '-db', args.database, '-id', str(id_thresh), '-strand','both', '-maxaccepts','100', '-maxrejects', '0', '-userout', F"{args.output}.usearch.txt", '-userfields', 'query+target+id+mism+qstrand+tstrand+qrow+trow+tlor+thir']
+usearch_comd_list = [args.usearch_path, '-usearch_global', F"{args.grnas.split('.fasta')[0]}_with_PAM.fasta", '-db', args.database, '-id', str(id_thresh), '-strand','both', '-maxaccepts','100', '-maxrejects', '0', '-userout', F"{args.output}.usearch.txt", '-userfields', 'query+target+id+mism+qstrand+tstrand+qrowdots+qrow+trow+tlor+thir']
 
 subprocess.run(" ".join(usearch_comd_list), shell=True)
 
@@ -89,14 +89,15 @@ with open(F"{args.output}.usearch.txt", "r") as ifile:
 
 count_above_thresh = 0
 oline_dict = {}
-buffer ="gRNA_name,target_name,gRNA_sequence,target_sequence,seed_mismatch_score,seed_indel_score,distal_mismatch_score,distal_indel_score,strand\n"#,start,stop\n"
+buffer ="gRNA_name,target_name,gRNA_sequence,target_sequence,mismatch_string,seed_mismatch_score,seed_indel_score,distal_mismatch_score,distal_indel_score,strand\n"#,start,stop\n"
 for grna in grna_hit_dict:
     grna_hit_list = grna_hit_dict[grna]
     for hit in grna_hit_list:
-        target_name, id, mm_count, qstrand, tstrand, query, target, tstart, tend = hit
+        target_name, id, mm_count, qstrand, tstrand, mismatch_string, query, target, tstart, tend = hit
         if qstrand == "+":
             query_trim = query[:-len(args.pam)]
             target_trim = target[:-len(args.pam)]
+            mismatch_string_trim = mismatch_string[:-len(args.pam)]
             seed_q = query_trim[-args.seed_len:]
             seed_t = target_trim[-args.seed_len:]
             distal_q = query_trim[:-args.seed_len]
@@ -104,6 +105,7 @@ for grna in grna_hit_dict:
         else:
             query_trim = query[len(args.pam):]
             target_trim = target[len(args.pam):]
+            mismatch_string_trim = mismatch_string[len(args.pam):]
             seed_q = query_trim[:args.seed_len]
             seed_t = target_trim[:args.seed_len]
             distal_q = query_trim[args.seed_len:]
@@ -111,7 +113,7 @@ for grna in grna_hit_dict:
         seed_mm, seed_indel = mm_and_indel(seed_q, seed_t)
         distal_mm, distal_indel = mm_and_indel(distal_q, distal_t)
         if seed_mm <= args.max_seed_mismatch and distal_mm <= args.max_distal_mismatch and seed_indel <= args.max_seed_indel and distal_indel <= args.max_distal_indel:
-            oline = F"{grna},{target_name},{query_trim},{target_trim},{seed_mm},{seed_indel},{distal_mm},{distal_indel},{qstrand}\n"
+            oline = F"{grna},{target_name},{query_trim},{target_trim},{mismatch_string_trim},{seed_mm},{seed_indel},{distal_mm},{distal_indel},{qstrand}\n"
             if oline not in oline_dict:
                 count_above_thresh += 1
                 buffer = F"{buffer}{oline}"
