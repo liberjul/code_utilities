@@ -16,11 +16,23 @@ def mm_and_indel(x, y):
     total_mm = sum(c1!=c2 for c1,c2 in zip(x,y))
     indels = x.count("-") + y.count("-")
     return [total_mm-indels, indels]
+
+def detect_strand(template, grna):
+    pos = template.find(grna)
+    if pos != "-1":
+        return "+"
+    else:
+        pos = template.find(reverse_complement(grna))
+        if pos != "-1":
+            return "-"
+        else:
+            raise ValueError(F"gRNA with sequence {grna} not found in template.")
 # Provide path to files and path to new, modified files
 start = time.time()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--database", type=str, help="FASTA database to check for hits")
+parser.add_argument("-t", "--template", type=str, help="FASTA of template to find direction of gRNAs")
 parser.add_argument("-g", "--grnas", type=str, help="FASTA of gRNAs")
 parser.add_argument("-u", "--usearch_path", type=str, help="Path of USEARCH executable")
 parser.add_argument("-p", "--pam", default="NGG", type=str, help="PAM sequence, such as NGG")
@@ -53,16 +65,26 @@ with open(args.grnas, "r") as ifile:
             max_grna_len = len(seq)
         grna_dict[header] = seq
 
+with open(args.template, "r") as ifile:
+    line = ifile.readline()
+    header = line.strip()[1:]
+    line = ifile.readline()
+    template_seq = ""
+    while line != "" and line[0] != ">":
+        template_seq = F"{seq}{line.strip().upper()}"
+        line = ifile.readline()
+
 PAM_str_f = args.pam
 PAM_str_r = reverse_complement(args.pam)
 
 with open(F"{args.grnas.split('.fasta')[0]}_with_PAM.fasta", "w") as ofile:
     for grna in grna_dict:
-        fwd_seq = grna_dict[grna] + PAM_str_f
-        # rev_seq = PAM_str_r + reverse_complement(grna_dict[grna])
-        ofile.write(F">{grna}\n{fwd_seq}\n")
-        # ofile.write(F">{grna}_rev\n{rev_seq}\n")
-
+        dir = detect_strand(template_seq, grna_dict[grna])
+        if dir == "+":
+            seq = grna_dict[grna] + PAM_str_f
+        elif dir == "-":
+            seq = PAM_str_r + reverse_complement(grna_dict[grna])
+        ofile.write(F">{grna}\n{seq}\n")
 
 id_thresh = 1 - ((args.max_seed_mismatch + args.max_distal_mismatch)/max_grna_len)
 

@@ -43,3 +43,7 @@ Various scripts for common tasks, involving ones for DNA sequence handling.
 ### [seq_to_filename.py](https://github.com/liberjul/code_utilities/blob/main/seq_to_filename.py)
 
 - Function (`seq_to_filename`) which takes a header string, a sequence string, and a filename then creates a corresponsing FASTA file.
+
+### [update_citation_manager.py](https://github.com/liberjul/code_utilities/blob/main/update_citation_manager.py)
+
+- Script to take BibTex files from two citation managers, identify the titles in the first but not second, and produce and importable BibTex file for updating the second database.
