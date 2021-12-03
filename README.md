@@ -32,9 +32,13 @@ Various scripts for common tasks, involving ones for DNA sequence handling.
 
 - Script which inputs a FASTA file of gRNAS, a FASTA file of sequences potentially targeted by gRNAs (database), and CRISPR match parameters, then outputs a CSV file with of potential targets in the database.
 
-### [check_grnas_v_db_par.py](https://github.com/liberjul/code_utilities/blob/main/check_grnas_v_db.py)
+### [check_grnas_v_db_par.py](https://github.com/liberjul/code_utilities/blob/main/check_grnas_v_db_par.py)
 
 - Script which inputs a FASTA file of gRNAS, a FASTA file of sequences potentially targeted by gRNAs (database), and CRISPR match parameters, then outputs a CSV file with of potential targets in the database. Parallelized approach compared to [check_grnas_v_db.py](https://github.com/liberjul/code_utilities/blob/main/check_grnas_v_db.py), but speed increases are not yet substantial.
+
+### [check_grnas_v_db_usearch.py](https://github.com/liberjul/code_utilities/blob/main/check_grnas_v_db_usearch.py)
+
+- Script which inputs a FASTA file of gRNAS, a FASTA file of sequences potentially targeted by gRNAs (database), and CRISPR match parameters, then outputs a CSV file with of potential targets in the database. Uses USEARCH algorithm for finding matches. Very fast, preferred approach.
 
 ### [seq_from_filename.py](https://github.com/liberjul/code_utilities/blob/main/seq_from_filename.py)
 
@@ -47,3 +51,11 @@ Various scripts for common tasks, involving ones for DNA sequence handling.
 ### [update_citation_manager.py](https://github.com/liberjul/code_utilities/blob/main/update_citation_manager.py)
 
 - Script to take BibTex files from two citation managers, identify the titles in the first but not second, and produce and importable BibTex file for updating the second database.
+
+### [flatten_fasta.py](https://github.com/liberjul/code_utilities/blob/main/flatten_fasta.py)
+
+- Script which takes a directory with `-d`/`--dir` and takes all FASTA files (`.fasta`) and converts their sequences to be one line per record. If file(s) is(are) large and order of records does not matter, `-i`/`--ignore_order` may improve speed. Does not alter headers or sequence, only formatting. Useful for copy-paste of FASTA contents.
+
+### [process_chromatograms_eurofins.py](https://github.com/liberjul/code_utilities/blob/main/process_chromatograms_eurofins.py)
+
+- Script which takes a directory with `-d`/`--dir`, finds all chromatogram files (`.ab1`) and a metadata file ending in `.csv` (see example [here](https://github.com/liberjul/code_utilities/blob/main/example_metadata.csv)). Auto-trims chromatogram sequences, exports to FASTA files, and the chromatogram and FASTA files have names corresponding to the "Name" column in the CSV. "Barcode" and "Name" columns are required in the chromatogram.

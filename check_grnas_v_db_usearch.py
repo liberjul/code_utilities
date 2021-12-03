@@ -13,6 +13,7 @@ import glob, sys, os, argparse, subprocess, time
 from auto_sanger_seq_assem import reverse_complement
 
 def mm_and_indel(x, y):
+    y = y.replace("U","T")
     total_mm = sum(c1!=c2 for c1,c2 in zip(x,y))
     indels = x.count("-") + y.count("-")
     return [total_mm-indels, indels]
