@@ -34,9 +34,10 @@ if "Barcode" not in data.columns or "Name" not in data.columns:
     print(F"The CSV file {meta[0]} does not contain the columns 'Barcode' and 'Name'.")
     sys.exit(1)
 
+chromat_files = []
 for i in range(len(data)):
     pos = data.Barcode[i]
     os.rename(seq_dict[pos], F"{parent}{data.Name[i]}_{pos}.ab1")
-chromat_files = glob.glob(parent + "*.ab1")
+    chromat_files.append(F"{parent}{data.Name[i]}_{pos}.ab1")
 for i in chromat_files:
     gen_cut_fastas_phred(i, parent, os.path.basename(i).split(".")[0])
