@@ -61,8 +61,8 @@ def gen_cut_fastas_phred(in_file, path, filename, n=5, min_length=10, output=Fal
     print(stop-start, filename)
     if len(cut_data) >= min_length:
         SeqIO.write(cut_data, path + filename + '.fasta', 'fasta')
-        if output:
-            return filename, cut_data.seq
+    if output:
+        return filename, cut_data.seq
 def rename_seqs(gen_path, data_file, path, ext):
     meta_data = pd.read_csv(gen_path + data_file)
     for j in ext:

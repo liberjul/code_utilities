@@ -56,6 +56,10 @@ Various scripts for common tasks, involving ones for DNA sequence handling.
 
 - Script which takes a directory with `-d`/`--dir` and takes all FASTA files (`.fasta`) and converts their sequences to be one line per record. If file(s) is(are) large and order of records does not matter, `-i`/`--ignore_order` may improve speed. Does not alter headers or sequence, only formatting. Useful for copy-paste of FASTA contents.
 
+### [fastas_to_csv.py](https://github.com/liberjul/code_utilities/blob/main/fastas_to_csv.py)
+
+- Script which takes a directory with `-d`/`--dir` and takes all FASTA files (`.fasta`) and outputs their sequences and headers to a CSV file. If file(s) is(are) large and order of records does not matter, `-i`/`--ignore_order` may improve speed. Does not alter headers or sequence, only formatting. Useful for copy-paste of FASTA contents.
+
 ### [process_chromatograms_eurofins.py](https://github.com/liberjul/code_utilities/blob/main/process_chromatograms_eurofins.py)
 
 - Script which takes a directory with `-d`/`--dir`, finds all chromatogram files (`.ab1`) and a metadata file ending in `.csv` (see example [here](https://github.com/liberjul/code_utilities/blob/main/example_metadata.csv)) within that directory. Auto-trims chromatogram sequences, exports to FASTA files, and the chromatogram and FASTA files have names corresponding to the "Name" column in the CSV. Also creates a CSV files with name and sequence in the same directory. "Barcode" and "Name" columns are required in the CSV.

@@ -42,7 +42,8 @@ for i in range(len(data)):
 buffer = "Name,Sequence\n"
 for i in chromat_files:
     name, seq = gen_cut_fastas_phred(i, parent, os.path.basename(i).split(".")[0], output = True)
-    buffer = F"{buffer}{name},{seq}\n"
+    if len(seq) > 10:
+        buffer = F"{buffer}{name},{seq}\n"
 
 with open(meta[0].split(".")[0] + "_sequences.csv", "w") as ofile:
     ofile.write(buffer)
