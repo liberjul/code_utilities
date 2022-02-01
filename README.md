@@ -58,9 +58,18 @@ Various scripts for common tasks, involving ones for DNA sequence handling.
 
 ### [process_chromatograms_eurofins.py](https://github.com/liberjul/code_utilities/blob/main/process_chromatograms_eurofins.py)
 
-- Script which takes a directory with `-d`/`--dir`, finds all chromatogram files (`.ab1`) and a metadata file ending in `.csv` (see example [here](https://github.com/liberjul/code_utilities/blob/main/example_metadata.csv)) within that directory. Auto-trims chromatogram sequences, exports to FASTA files, and the chromatogram and FASTA files have names corresponding to the "Name" column in the CSV. "Barcode" and "Name" columns are required in the CSV.
+- Script which takes a directory with `-d`/`--dir`, finds all chromatogram files (`.ab1`) and a metadata file ending in `.csv` (see example [here](https://github.com/liberjul/code_utilities/blob/main/example_metadata.csv)) within that directory. Auto-trims chromatogram sequences, exports to FASTA files, and the chromatogram and FASTA files have names corresponding to the "Name" column in the CSV. Also creates a CSV files with name and sequence in the same directory. "Barcode" and "Name" columns are required in the CSV.
 
 Example usage:
 ```
 python process_chromatograms_eurofins.py --dir ./2021_12_03_1954440-1/
+```
+
+### [jgi_extract_gene_features.py](https://github.com/liberjul/code_utilities/blob/main/jgi_extract_gene_features.py)
+
+- Script which takes a CSV with `-i`/`--input` (see example [here](https://github.com/liberjul/code_utilities/blob/main/gene_links.csv)), finds gene features from JGI, and output them to a CSV file (looks like [this](https://github.com/liberjul/code_utilities/blob/main/gene_features.csv)) compatible with Benchling's feature library input. Requires the correct version of [chromedriver](https://chromedriver.chromium.org/downloads) on the PATH.
+
+Example usage:
+```
+python jgi_extract_gene_features.py --input gene_links.csv --output gene_features.csv
 ```
