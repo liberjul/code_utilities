@@ -13,11 +13,10 @@ if args.dir[-1] != "/":
 files = glob.glob(args.dir + "*.fasta")
 
 print(files)
-
+seq_dict = {}
+if not args.ignore_order:
+    header_list = []
 for file in files:
-    seq_dict = {}
-    if not args.ignore_order:
-        header_list = []
     with open(file, "r") as ifile:
         line = ifile.readline()
         while line != "":
@@ -34,9 +33,9 @@ for file in files:
 buffer = "Name,Sequence\n"
 if not args.ignore_order:
     for head in header_list:
-        buffer = F"{buffer}{head},{seq_dict[head]}\n"
+        buffer = F"{buffer}{head.strip()},{seq_dict[head]}\n"
 else:
     for head in seq_dict:
-        buffer = F"{buffer}{head},{seq_dict[head]}"
+        buffer = F"{buffer}{head.strip()},{seq_dict[head]}"
 with open(F"{args.dir}sequences.csv", "w") as ofile:
     ofile.write(buffer)
