@@ -77,3 +77,12 @@ Example usage:
 ```
 python jgi_extract_gene_features.py --input gene_links.csv --output gene_features.csv
 ```
+
+### [extract_otu_seqs_w_filter.py](https://github.com/liberjul/code_utilities/blob/main/extract_otu_seqs_w_filter.py)
+
+- Script which takes representative sequences in FASTA format `-r/--reps`, [CONSTAX](https://github.com/liberjul/CONSTAXv2) tab-separated value classifications `-c/--class_file`, and a filter string `-f/--filter`, and outputs matching representative sequences to an output file `-o/--output`. The filter string is formatted as `<Rank>;<Value>`, where value can be a taxon name or "NaN", possibly preceded by "!" to indicate that filtered rows should not include that value.
+
+Example usage:
+```
+python .\extract_otu_seqs_w_filter.py -r .\otus_R1.fasta -c .\constax_taxonomy.txt -f "Class;Microbotryomycetes;Genus;NaN" -o ".\MBM_rep_seqs.fasta"
+```
