@@ -31,14 +31,13 @@ def gen_cut_fastas(in_file, path, filename, n=5):
     cut_data = in_data[start:stop]
     cut_data.id = filename
     SeqIO.write(cut_data, path + filename + '.fasta', 'fasta')
-def gen_cut_fastas_phred(in_file, path, filename, n=5, min_length=10, output=False):
+def gen_cut_fastas_phred(in_file, path, filename, n=50, min_length=10, output=False):
     '''
     Inputs name of .ab1 file as string and new file name to save .fasta file to.
     Saves a .fasta file with cut sequence and changed name.
     '''
     in_data = SeqIO.read(in_file, 'abi')
     i = 0
-    n = 50
     qual = False
     while qual == False:
         i += 1

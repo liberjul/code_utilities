@@ -4,6 +4,8 @@ from abi_handling import gen_cut_fastas_phred
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--dir", type=str, help="Unzipped directory containing .ab1 and .csv files")
+parser.add_argument("-n", "--nucs_in_window", type=int, default=50, help="Nucleotides in sliding window; first stretch of n nucleotides with quality above 20 are output.")
+parser.add_argument("-m", "--min_length", type=int, default=50, help="Minimum length of sequence to be output as a FASTA.")
 args = parser.parse_args()
 
 parent = args.dir
@@ -20,30 +22,44 @@ for i in seq_files:
     seq_dict[os.path.basename(i).split("_")[index_of_pos]] = i
 print(seq_dict)
 
-meta = glob.glob(parent + "*.csv")
+meta = [x for x in glob.glob(parent + "*.csv") if x != parent + "sequences.csv"]
 
+no_meta  = False
 if len(meta) > 1:
     print("There is more than 1 metadata (*.csv) file, please remove additional.")
     sys.exit(1)
 elif len(meta) == 0:
-    print("There is no metadata (*.csv) file, please add it with columns 'Barcode' and 'Name'.")
-    sys.exit(1)
+    print("There is no metadata (*.csv) file. If you wish to rename sequences, please add a CSV file with columns 'Barcode' and 'Name'.")
+    cont = input("Do you wish to continue? y/n \n").lower().strip()
+    if cont == "y":
+        print("Continuing...")
+        no_meta = True
+    else:
+        print("Exiting...")
+        sys.exit(1)
 
-data = pd.read_csv(meta[0])
-if "Barcode" not in data.columns or "Name" not in data.columns:
-    print(F"The CSV file {meta[0]} does not contain the columns 'Barcode' and 'Name'.")
-    sys.exit(1)
+if no_meta:
+    buffer = "Name,Sequence\n"
+    for i in seq_files:
+        name, seq = gen_cut_fastas_phred(i, parent, os.path.basename(i).split(".")[0], output = True, n=args.nucs_in_window, min_length = args.min_length)
+        if len(seq) >= args.min_length:
+            buffer = F"{buffer}{name},{seq}\n"
+else:
+    data = pd.read_csv(meta[0])
+    if "Barcode" not in data.columns or "Name" not in data.columns:
+        print(F"The CSV file {meta[0]} does not contain the columns 'Barcode' and 'Name'.")
+        sys.exit(1)
 
-chromat_files = []
-for i in range(len(data)):
-    pos = data.Barcode[i]
-    os.rename(seq_dict[pos], F"{parent}{data.Name[i]}_{pos}.ab1")
-    chromat_files.append(F"{parent}{data.Name[i]}_{pos}.ab1")
-buffer = "Name,Sequence\n"
-for i in chromat_files:
-    name, seq = gen_cut_fastas_phred(i, parent, os.path.basename(i).split(".")[0], output = True)
-    if len(seq) > 10:
-        buffer = F"{buffer}{name},{seq}\n"
+    chromat_files = []
+    for i in range(len(data)):
+        pos = data.Barcode[i]
+        os.rename(seq_dict[pos], F"{parent}{data.Name[i]}_{pos}.ab1")
+        chromat_files.append(F"{parent}{data.Name[i]}_{pos}.ab1")
+    buffer = "Name,Sequence\n"
+    for i in chromat_files:
+        name, seq = gen_cut_fastas_phred(i, parent, os.path.basename(i).split(".")[0], output = True, n=args.nucs_in_window, min_length = args.min_length)
+        if len(seq) >= min_length:
+            buffer = F"{buffer}{name},{seq}\n"
 
-with open(meta[0].split(".")[0] + "_sequences.csv", "w") as ofile:
+with open(parent + "sequences.csv", "w") as ofile:
     ofile.write(buffer)
