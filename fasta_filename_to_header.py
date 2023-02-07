@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import glob, sys, os, argparse
 
 # Provide path to files and path to new, modified files

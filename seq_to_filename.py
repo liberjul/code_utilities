@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 def seq_to_filename(header, seq, file, wrap = False, wrap_count = 60):
     with open(file, "w") as ofile:
         ofile.write(">" + header.strip(">").strip() + "\n")

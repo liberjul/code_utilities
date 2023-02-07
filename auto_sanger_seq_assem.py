@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 def reverse_complement(seq, rna=False):
     if rna:
         comp_dict = {"A" : "U", "U" : "A", "C" : "G", "G" : "C",

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import argparse, glob, sys, os
 import pandas as pd
 from abi_handling import gen_cut_fastas_phred
