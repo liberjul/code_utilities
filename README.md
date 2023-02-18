@@ -84,5 +84,18 @@ python jgi_extract_gene_features.py --input gene_links.csv --output gene_feature
 
 Example usage:
 ```
-python .\extract_otu_seqs_w_filter.py -r .\otus_R1.fasta -c .\constax_taxonomy.txt -f "Class;Microbotryomycetes;Genus;NaN" -o ".\MBM_rep_seqs.fasta"
+python .\extract_otu_seqs_w_filter.py -r .\otus_R1.fasta \
+  -c .\constax_taxonomy.txt -f "Class;Microbotryomycetes;Genus;NaN" -o ".\MBM_rep_seqs.fasta"
+```
+
+### [reindex_gb_plasmids.py](https://github.com/liberjul/code_utilities/blob/main/reindex_gb_plasmids.py)
+
+- Script which reindexes plasmid files in GenBank format (`-i/--input`) to start with sequences provided as `-s/--start_string`. Can use wildcard for file name if in quotes.
+
+Example usage:
+
+```
+python ./reindex_gb_plasmids.py \
+    -i "2023_02_18_Withers_x7a_results/Withers_x7a_results/*.gbk" \
+    -s ttaagattgaatcctgttgccggtcttgcgatgattatcatat # From the NOS terminator
 ```
