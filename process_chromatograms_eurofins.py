@@ -5,7 +5,7 @@ from abi_handling import gen_cut_fastas_phred
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--dir", type=str, help="Unzipped directory containing .ab1 and .csv files")
-parser.add_argument("-n", "--nucs_in_window", type=int, default=50, help="Nucleotides in sliding window; first stretch of n nucleotides with quality above 20 are output.")
+parser.add_argument("-n", "--nucs_in_window", type=int, default=50, help="Nucleotides in sliding window; first stretch of at least n nucleotides with quality above 20 are output.")
 parser.add_argument("-m", "--min_length", type=int, default=50, help="Minimum length of sequence to be output as a FASTA.")
 args = parser.parse_args()
 
