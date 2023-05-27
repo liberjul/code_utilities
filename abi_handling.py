@@ -3,6 +3,8 @@ import glob, os, time
 import pandas as pd
 import numpy as np
 import Bio.SeqIO as SeqIO
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
 from Bio.Blast import NCBIWWW
 from Bio.Blast import NCBIXML
 
@@ -32,33 +34,25 @@ def gen_cut_fastas(in_file, path, filename, n=5):
     cut_data = in_data[start:stop]
     cut_data.id = filename
     SeqIO.write(cut_data, path + filename + '.fasta', 'fasta')
-def gen_cut_fastas_phred(in_file, path, filename, n=50, min_length=10, output=False):
+def gen_cut_fastas_phred(in_file, path, filename, n=50, min_length=10, output=False, q_thresh=20):
     '''
     Inputs name of .ab1 file as string and new file name to save .fasta file to.
     Saves a .fasta file with cut sequence and changed name.
     '''
     in_data = SeqIO.read(in_file, 'abi')
-    i = 0
-    qual = False
-    while qual == False:
-        i += 1
-        frame = np.array(in_data.letter_annotations["phred_quality"][i:i+n])
-        q = frame < 20
-        count = np.sum(q)
-        if count == 0 or i > 1200:
-            qual = True
-            start= i
-    while qual:
-        i += 1
-        frame = np.array(in_data.letter_annotations["phred_quality"][i:i+n])
-        q = frame < 20
-        count = np.sum(q)
-        if count > 0 or i > 1200:
-            qual = False
-            stop = i
-    cut_data = in_data[start:stop]
-    cut_data.id = filename
-    print(stop-start, filename)
+    seq_str, quals = in_data.seq, in_data.letter_annotations["phred_quality"]
+    blanked_seq = "".join([seq_str[i] if quals[i] >= q_thresh else " " for i in range(len(seq_str))])
+    seq_list = blanked_seq.split()
+    longest_seq_len = 0
+    for i in seq_list:
+        if len(i) > longest_seq_len:
+            longest_seq_len = len(i)
+    for i in seq_list:
+        if len(i) == longest_seq_len:
+            cut_seq = i
+            break
+    cut_data = SeqRecord(Seq(cut_seq), id = filename, description="")
+    print(longest_seq_len, filename)
     if len(cut_data) >= min_length:
         SeqIO.write(cut_data, path + filename + '.fasta', 'fasta')
     if output:
