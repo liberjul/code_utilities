@@ -40,7 +40,7 @@ for i in prom_dict:
         tm_fwd = 0
         while prim_len < 30 and tm_fwd < 60:
             cand_primer_fwd = seq[-prim_len:-3]
-            tm_fwd = primer3.calcTm(cand_primer_fwd, dntp_conc=0.8, dna_conc=50, dv_conc=1.5)
+            tm_fwd = primer3.calc_tm(cand_primer_fwd, dntp_conc=0.8, dna_conc=50, dv_conc=1.5)
             # print(cand_primer_fwd, tm_fwd)
             if tm_fwd < 50:
                 prim_len += 1
@@ -48,7 +48,7 @@ for i in prom_dict:
                 cand_primer_fwd = str(Seq(cand_primer_fwd).reverse_complement())
                 break
         # print(cand_primer_fwd, tm_fwd)
-        dg_homo_fwd = primer3.calcHomodimer(cand_primer_fwd, dntp_conc=0.8, dna_conc=50, dv_conc=1.5).dg
+        dg_homo_fwd = primer3.calc_homodimer(cand_primer_fwd, dntp_conc=0.8, dna_conc=50, dv_conc=1.5).dg
         if dg_homo_fwd < -10000:
             break
         loc = seq.find("ttg")
@@ -58,13 +58,13 @@ for i in prom_dict:
             tm_rev = 0
             while prim_len < 27 and tm_rev < 60:
                 cand_primer_rev = seq[loc:loc+prim_len]
-                tm_rev = primer3.calcTm(cand_primer_rev, dntp_conc=0.8, dna_conc=50, dv_conc=1.5)
+                tm_rev = primer3.calc_tm(cand_primer_rev, dntp_conc=0.8, dna_conc=50, dv_conc=1.5)
                 if tm_rev < 50:
                     prim_len += 1
                 else:
                     break
-            dg_homo_rev = primer3.calcHomodimer(cand_primer_rev, dntp_conc=0.8, dna_conc=50, dv_conc=1.5).dg
-            dg_hetero = primer3.calcHeterodimer(cand_primer_rev, cand_primer_fwd, dntp_conc=0.8, dna_conc=50, dv_conc=1.5).dg
+            dg_homo_rev = primer3.calc_homodimer(cand_primer_rev, dntp_conc=0.8, dna_conc=50, dv_conc=1.5).dg
+            dg_hetero = primer3.calc_heterodimer(cand_primer_rev, cand_primer_fwd, dntp_conc=0.8, dna_conc=50, dv_conc=1.5).dg
             if dg_homo_rev < -10000 or dg_hetero < -10000 or abs(tm_fwd - tm_rev) > 5:
                 seq = seq[loc+3:]
             else:
