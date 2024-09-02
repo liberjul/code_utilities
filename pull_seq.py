@@ -31,16 +31,16 @@ if count_matches == 0:
     raise ValueError("Contig not found in FASTA")
 elif count_matches > 1:
     raise ValueError("Contig found multiple times FASTA")
-    
+
 if args.stop < 0:
     if args.minus_strand:
         rc_seq = str(Seq(seq[args.start-1]).reverse_complement())
-        print(F"{header}_{args.start}..{len(seq)}_-\n{rc_seq}")
+        print(F">{header}_{args.start}..{len(seq)}_-\n{rc_seq}")
     else:
-        print(F"{header}_{args.start}..{len(seq)}_+\n{seq[args.start-1:args.stop]}")
+        print(F">{header}_{args.start}..{len(seq)}_+\n{seq[args.start-1:args.stop]}")
 else:
     if args.minus_strand:
         rc_seq = str(Seq(seq[args.start-1:args.stop]).reverse_complement())
-        print(F"{header}_{args.start}..{args.stop}_-\n{rc_seq}")
+        print(F">{header}_{args.start}..{args.stop}_-\n{rc_seq}")
     else:
-        print(F"{header}_{args.start}..{args.stop}_+\n{seq[args.start-1:args.stop]}")
+        print(F">{header}_{args.start}..{args.stop}_+\n{seq[args.start-1:args.stop]}")
